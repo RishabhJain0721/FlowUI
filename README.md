@@ -23,6 +23,10 @@ This is a React-based application that simulates a decision-making process flow 
 - **Customization**:
   - The no. of remainders to be sent can be easily changed in the code, changing the depth of tree
 
+    <img src="https://github.com/user-attachments/assets/74995e6e-4ac0-4543-980a-44f38263d8ce" width="700" height="auto" />
+    <img src="https://github.com/user-attachments/assets/03f7d14e-3b3e-457a-bcb0-da6bd7b96566" width="700" height="auto" />
+
+
 ## How It Works
 
 ### 1. **Rendering the Flow Tree**
