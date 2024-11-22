@@ -7,7 +7,8 @@ const Home = () => {
   const navigate = useNavigate();
   const [logs, setLogs] = useState([]);
   const [isFlowRunning, setIsFlowRunning] = useState(false);
-  let availableRemainders = 2;
+  const availableRemainders = 2;
+
   let tempLogs = [];
 
   const log = (message) => {
@@ -19,7 +20,6 @@ const Home = () => {
   const sendRemainder = async () => {
     await new Promise((resolve) => setTimeout(resolve, 3000));
     log("Reminder Email sent");
-    availableRemainders--;
   };
 
   const renewalDecision = async () => {
@@ -32,15 +32,18 @@ const Home = () => {
     tempLogs = [];
     setLogs([]);
 
-    while (availableRemainders > 0) {
-      sendRemainder();
+    let remainders = availableRemainders;
+
+    while (remainders > 0) {
+      await sendRemainder();
       const renewed = await renewalDecision();
       if (renewed) {
         log("Renewed! Thanks");
         break;
       } else {
         log("Not renewed");
-        if (availableRemainders === 0) {
+        remainders--;
+        if (remainders === 0) {
           log("No further action");
           break;
         }
@@ -48,27 +51,30 @@ const Home = () => {
     }
 
     setIsFlowRunning(false);
-
     await storeLog(tempLogs);
+  };
+
+  const renderTree = (depth) => {
+    if (depth === 0) return null;
+
+    return (
+      <div className="flex flex-col items-center w-full">
+        <Box name="Reminder Mail" />
+        <div className="flex justify-between mt-4">
+          <Box name="Renewed" />
+          <div className="flex flex-col items-center ml-4 w-1/2">
+            <Box name="Not Renewed" />
+            {renderTree(depth - 1)}
+          </div>
+        </div>
+      </div>
+    );
   };
 
   return (
     <div className="flex flex-col justify-start items-center min-h-screen p-4 bg-gray-100">
       {/* Flow Diagram */}
-      <div className="flex flex-col items-center">
-        <Box name="Reminder Mail" />
-        <div className="flex justify-between items-start mt-4">
-          <Box name="Renewed" />
-          <div className="flex flex-col items-center">
-            <Box name="Not Renewed" />
-            <Box name="Reminder Mail" className="mt-4" />
-            <div className="flex justify-between mt-4">
-              <Box name="Renewed" />
-              <Box name="Not Renewed" className="ml-4" />
-            </div>
-          </div>
-        </div>
-      </div>
+      {renderTree(availableRemainders)}
 
       {/* Start Button */}
       <div className="mt-8">
@@ -97,9 +103,7 @@ const Home = () => {
       <div className="mt-8">
         <button
           onClick={() => navigate("/all-logs")}
-          className={`px-6 py-3 rounded-lg text-white ${
-            isFlowRunning ? "bg-gray-400" : "bg-red-500 hover:bg-red-600"
-          }`}
+          className="px-6 py-3 rounded-lg text-white bg-red-500 hover:bg-red-600"
         >
           View All logs
         </button>
